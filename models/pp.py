@@ -1,6 +1,6 @@
+import pandas as pd
 import pickle
 from sklearn.linear_model import LinearRegression
-import pandas as pd
 
 # Load the price data
 data = pd.read_csv("data/price_data.csv")
