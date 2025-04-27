@@ -23,7 +23,10 @@ def price_prediction_page():
         future_months = [(month + i - 1) % 12 + 1 for i in range(6)]
         predictions = model.predict(np.array(future_months).reshape(-1, 1))
 
+        # Map future months to string labels (e.g., "Jan", "Feb")
+        month_labels = [pd.Timestamp(f"{year}-{m:02d}-01").strftime("%b") for m in future_months]
+
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=filtered["Date"], y=filtered["Modal Price"], name="Historical"))
-        fig.add_trace(go.Scatter(x=future_months, y=predictions, name="Predicted"))
+        fig.add_trace(go.Scatter(x=month_labels, y=predictions, name="Predicted"))
         st.plotly_chart(fig)
