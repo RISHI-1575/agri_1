@@ -92,7 +92,15 @@ else:
 
     # Render the selected page
     if st.session_state.current_page == "Home":
-        pass  # Additional home content can be added here if needed
+        # Additional points about the project on the Home page
+        st.markdown("### About AgriPredict")
+        st.markdown("""
+        - 🌟 **Data-Driven Insights**: Leverage data to make informed decisions about crops, pricing, and markets.
+        - 📈 **Price Prediction**: Predict future crop prices to maximize profitability.
+        - 🌾 **Crop Recommendation**: Get crop suggestions based on soil type, region, and land size.
+        - 🏪 **Marketplace Integration**: Connect farmers with potential buyers and streamline transactions.
+        - 💡 **User-Friendly Interface**: Easy-to-use platform designed for both farmers and businesses.
+        """)
 
     elif st.session_state.current_page == "Price Prediction":
         price_prediction_page()
