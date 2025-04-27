@@ -142,18 +142,18 @@ else:
     elif st.session_state.current_page == "Crop Recommendation":
         st.title("🌾 Crop Recommendation")
 
-        # Inputs
-        soil_type = st.selectbox("Select Soil Type", ["Loamy", "Sandy", "Clay"])
-        land_size = st.number_input("Enter Land Size (in acres)", min_value=1.0)
-        place = st.selectbox("Select Place", ["North Karnataka", "South Karnataka", "Central Karnataka"])
+    # Inputs
+       soil_type = st.selectbox("Select Soil Type", ["Loamy", "Sandy", "Clay"])
+       land_size = st.number_input("Enter Land Size (in acres)", min_value=1.0)
+       place = st.selectbox("Select Place", ["North Karnataka", "South Karnataka", "Central Karnataka"])
 
-        if st.button("Get Recommendations"):
-            # Prepare input data
-            recommendations = recommend_crops(place, soil_type, land_size)
+       if st.button("Get Recommendations"):
+        # Prepare input data
+           recommendations = recommend_crops(place, soil_type, land_size)
 
-            # Display recommendations
-            df = pd.DataFrame(recommendations)
-            st.table(df)
+        # Display recommendations
+           df = pd.DataFrame(recommendations)
+           st.table(df)
 
     elif st.session_state.current_page == "Marketplace":
         marketplace_page()
