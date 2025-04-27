@@ -20,9 +20,12 @@ def recommend_crops(place, soil, land_area):
         (data['soil_type'] == soil)
     ]
 
-    # Sort crops by expected return and demand score
-    recommended_crops = filtered_data.sort_values(by=['expected_return_per_acre', 'demand_score'], ascending=False)
+    # Dynamically calculate expected return based on land size
+    filtered_data['dynamic_expected_return'] = filtered_data['expected_return_per_acre'] * land_area
+
+    # Sort crops by dynamic expected return and demand score
+    recommended_crops = filtered_data.sort_values(by=['dynamic_expected_return', 'demand_score'], ascending=False)
 
     # Prepare output
-    output = recommended_crops[['crop_type', 'expected_return_per_acre', 'demand_score']].to_dict(orient='records')
+    output = recommended_crops[['crop_type', 'dynamic_expected_return', 'demand_score']].to_dict(orient='records')
     return output
