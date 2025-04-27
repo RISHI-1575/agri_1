@@ -33,8 +33,7 @@ if not st.session_state.authenticated:
                 st.session_state.authenticated = True
                 st.session_state.role = role
                 st.success("Login successful!")
-                # Ensure rerun is part of button logic
-                st.experimental_rerun()  
+                st.experimental_rerun()
             else:
                 st.error("Invalid username or password.")
 
@@ -50,6 +49,7 @@ if not st.session_state.authenticated:
                 st.success(message)
             else:
                 st.error(message)
+
 # Main App
 else:
     st.sidebar.title("Navigation")
@@ -58,20 +58,12 @@ else:
     # Home Page
     if selected_page == "Home":
         st.title("🌾 AgriPredict - Home")
-        state = st.selectbox("Select Your State", ["Karnataka"])
-        district = st.selectbox("Select Your District", ["Bangalore", "Mysore", "Hubli", "Mangalore"])
-        if st.button("Get Weather"):
-            api_key = "your_openweather_api_key"
-            city = district
-            weather_url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
-            response = requests.get(weather_url)
-            if response.status_code == 200:
-                data = response.json()
-                weather = data["weather"][0]["description"]
-                temp = data["main"]["temp"]
-                st.success(f"Weather in {city}: {weather}, Temperature: {temp}°C")
-            else:
-                st.error("Unable to fetch weather data. Please try again later.")
+        st.markdown("""
+        **Welcome to AgriPredict!**
+        - AgriPredict is a comprehensive platform designed to empower farmers and agribusinesses.
+        - With tools for price prediction, crop recommendation, and a marketplace for trading agricultural products, we aim to revolutionize the agricultural ecosystem.
+        - Explore the platform to maximize your yields and profits.
+        """)
 
     # Price Prediction Page
     elif selected_page == "Price Prediction":
@@ -80,12 +72,17 @@ else:
     # Crop Recommendation Page
     elif selected_page == "Crop Recommendation":
         st.title("🌾 Crop Recommendation")
+
+        # Inputs
         soil_type = st.selectbox("Select Soil Type", ["Loamy", "Sandy", "Clay"])
         land_size = st.number_input("Enter Land Size (in acres)", min_value=1.0)
-        irrigation = st.selectbox("Irrigation Type", ["Drip", "Sprinkler", "Flood"])
-        harvest_season = st.selectbox("Preferred Harvest Season", ["Kharif", "Rabi", "Zaid"])
+        place = st.selectbox("Select Place", ["North Karnataka", "South Karnataka", "Central Karnataka"])
+
         if st.button("Get Recommendations"):
-            recommendations = recommend_crops("Karnataka", soil_type, land_size, irrigation, harvest_season)
+            # Prepare input data
+            recommendations = recommend_crops(place, soil_type, land_size)
+
+            # Display recommendations
             df = pd.DataFrame(recommendations)
             st.table(df)
 
