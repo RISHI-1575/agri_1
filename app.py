@@ -53,15 +53,14 @@ if not st.session_state.authenticated:
 
 # Main App
 else:
-    if st.session_state.current_page == "Home":
-        # Home Page with welcome message
-        st.title("🌾 Welcome to AgriPredict!")
-        st.markdown("""
-        **A platform to help farmers and agribusinesses make informed decisions.**
-        Navigate to different sections using the buttons below.
-        """)
+    # Keep the welcome message at the top for all pages
+    st.title("🌾 Welcome to AgriPredict!")
+    st.markdown("""
+    **A platform to help farmers and agribusinesses make informed decisions.**
+    Navigate to different sections using the buttons below.
+    """)
 
-    # Feature buttons in a line
+    # Feature buttons in a line below the welcome message
     button_style = """
         <style>
         div.stButton > button {
@@ -92,7 +91,10 @@ else:
             st.session_state.current_page = "Marketplace"
 
     # Render the selected page
-    if st.session_state.current_page == "Price Prediction":
+    if st.session_state.current_page == "Home":
+        pass  # Additional home content can be added here if needed
+
+    elif st.session_state.current_page == "Price Prediction":
         price_prediction_page()
 
     elif st.session_state.current_page == "Crop Recommendation":
