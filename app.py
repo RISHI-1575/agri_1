@@ -57,46 +57,54 @@ else:
     st.title("🌾 Welcome to AgriPredict!")
     st.markdown("""
     **A platform to help farmers and agribusinesses make informed decisions.**
-    Navigate to different sections using the buttons below.
+    Navigate to different sections using the buttons in the menu box.
     """)
 
-    # Centered 2x2 grid for navigation buttons
-    button_style = """
+    # Add a log box with buttons for all features on the top-right
+    log_box_style = """
         <style>
+        .log-box {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            width: 300px;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .log-box h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
         div.stButton > button {
-            font-size: 18px; /* Increase font size */
-            height: 80px; /* Increase height */
-            width: 100%; /* Stretch button to column width */
+            font-size: 16px; /* Adjust button font size */
+            width: 100%; /* Stretch buttons to full width */
+            margin-bottom: 10px; /* Add space between buttons */
         }
         </style>
+        <div class="log-box">
+            <h4>📂 Features</h4>
     """
-    st.markdown(button_style, unsafe_allow_html=True)
+    st.markdown(log_box_style, unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2, gap="large")  # Two columns for the first row
-    col3, col4 = st.columns(2, gap="large")  # Two columns for the second row
+    # Render buttons for navigation inside the log box
+    if st.button("🏠 Home", key="home"):
+        st.session_state.current_page = "Home"
+    if st.button("📈 Price Prediction", key="price_prediction"):
+        st.session_state.current_page = "Price Prediction"
+    if st.button("🌾 Crop Recommendation", key="crop_recommendation"):
+        st.session_state.current_page = "Crop Recommendation"
+    if st.button("🏪 Marketplace", key="marketplace"):
+        st.session_state.current_page = "Marketplace"
 
-    with col1:
-        if st.button("🏠 Home"):
-            st.session_state.current_page = "Home"
-
-    with col2:
-        if st.button("📈 Price Prediction"):
-            st.session_state.current_page = "Price Prediction"
-
-    with col3:
-        if st.button("🌾 Crop Recommendation"):
-            st.session_state.current_page = "Crop Recommendation"
-
-    with col4:
-        if st.button("🏪 Marketplace"):
-            st.session_state.current_page = "Marketplace"
+    # Close the log box HTML
+    st.markdown("</div>", unsafe_allow_html=True)
 
     # Render the selected page
     if st.session_state.current_page == "Home":
-        st.write("""
-        - A platform to help farmers and agribusinesses make informed decisions.
-        - Navigate to different sections using the buttons above.
-        """)
+        pass  # No additional text for the Home page
 
     elif st.session_state.current_page == "Price Prediction":
         price_prediction_page()
