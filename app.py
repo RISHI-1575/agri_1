@@ -53,11 +53,26 @@ if not st.session_state.authenticated:
 
 # Main App
 else:
-    # Create buttons for navigation
+    # Welcome message
     st.title("🌾 Welcome to AgriPredict!")
-    st.markdown("**Empowering farmers and businesses with data-driven insights.**")
+    st.markdown("""
+    **A platform to help farmers and agribusinesses make informed decisions.**
+    Navigate to different sections using the buttons below.
+    """)
 
+    # Create buttons for navigation with larger size
     col1, col2, col3, col4 = st.columns(4)
+
+    button_style = """
+        <style>
+        div.stButton > button {
+            font-size: 18px; /* Increase font size */
+            height: 80px; /* Increase height */
+            width: 100%; /* Stretch button to column width */
+        }
+        </style>
+    """
+    st.markdown(button_style, unsafe_allow_html=True)
 
     with col1:
         if st.button("🏠 Home"):
