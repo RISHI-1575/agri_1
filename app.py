@@ -9,64 +9,86 @@ from utils.crop_recommendation import recommend_crops
 # Set page configuration
 st.set_page_config(page_title="AgriPredict", layout="wide")
 
-# Sidebar for navigation
-st.sidebar.title("Navigation")
-selected_page = st.sidebar.radio("Go to", ["Home", "Price Prediction", "Crop Recommendation", "Marketplace"])
+# Initialize session state
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+if "role" not in st.session_state:
+    st.session_state.role = None
 
-# Home Page
-if selected_page == "Home":
-    st.title("🌾 AgriPredict - Home")
+# Login/Signup Page
+if not st.session_state.authenticated:
+    st.title("🔐 Login / Signup")
 
-    # Area Selection
-    state = st.selectbox("Select Your State", ["Karnataka"])
-    district = st.selectbox("Select Your District", ["Bangalore", "Mysore", "Hubli", "Mangalore"])
+    # Tabs for login and signup
+    tab1, tab2 = st.tabs(["Login", "Signup"])
 
-    # Weather API
-    if st.button("Get Weather"):
-        api_key = "your_openweather_api_key"  # Replace with your API key
-        city = district
-        weather_url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+    with tab1:
+        st.header("Login")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        role = st.selectbox("Role", ["farmer", "company"])
 
-        response = requests.get(weather_url)
-        if response.status_code == 200:
-            data = response.json()
-            weather = data["weather"][0]["description"]
-            temp = data["main"]["temp"]
-            st.success(f"Weather in {city}: {weather}, Temperature: {temp}°C")
-        else:
-            st.error("Unable to fetch weather data. Please try again later.")
+        if st.button("Login"):
+            if validate_login(username, password, role):
+                st.session_state.authenticated = True
+                st.session_state.role = role
+                st.success("Login successful!")
+                st.experimental_rerun()
+            else:
+                st.error("Invalid username or password.")
 
-    # Farming Tips
-    st.subheader("Farming Tips")
-    st.markdown("""
-    - Use high-quality seeds for better crop yield.
-    - Practice crop rotation to maintain soil fertility.
-    - Ensure proper irrigation and pest control.
-    - Stay updated with market trends to maximize profits.
-    """)
+    with tab2:
+        st.header("Signup")
+        username = st.text_input("New Username")
+        password = st.text_input("New Password", type="password")
+        role = st.selectbox("Role", ["farmer", "company"], key="signup_role")
 
-# Price Prediction Page
-elif selected_page == "Price Prediction":
-    price_prediction_page()
+        if st.button("Signup"):
+            message = register_user(username, password, role)
+            if "Account created" in message:
+                st.success(message)
+            else:
+                st.error(message)
 
-# Crop Recommendation Page
-elif selected_page == "Crop Recommendation":
-    st.title("🌾 Crop Recommendation")
+# Main App
+else:
+    st.sidebar.title("Navigation")
+    selected_page = st.sidebar.radio("Go to", ["Home", "Price Prediction", "Crop Recommendation", "Marketplace"])
 
-    # Inputs
-    soil_type = st.selectbox("Select Soil Type", ["Loamy", "Sandy", "Clay"])
-    land_size = st.number_input("Enter Land Size (in acres)", min_value=1.0)
+    # Home Page
+    if selected_page == "Home":
+        st.title("🌾 AgriPredict - Home")
+        state = st.selectbox("Select Your State", ["Karnataka"])
+        district = st.selectbox("Select Your District", ["Bangalore", "Mysore", "Hubli", "Mangalore"])
+        if st.button("Get Weather"):
+            api_key = "your_openweather_api_key"
+            city = district
+            weather_url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+            response = requests.get(weather_url)
+            if response.status_code == 200:
+                data = response.json()
+                weather = data["weather"][0]["description"]
+                temp = data["main"]["temp"]
+                st.success(f"Weather in {city}: {weather}, Temperature: {temp}°C")
+            else:
+                st.error("Unable to fetch weather data. Please try again later.")
 
-    if st.button("Get Recommendations"):
-        # Prepare input data
-        recommendations = recommend_crops("Karnataka", soil_type, land_size)
+    # Price Prediction Page
+    elif selected_page == "Price Prediction":
+        price_prediction_page()
 
-        # Display recommendations
-        df = pd.DataFrame(recommendations)
-        st.table(df)
+    # Crop Recommendation Page
+    elif selected_page == "Crop Recommendation":
+        st.title("🌾 Crop Recommendation")
+        soil_type = st.selectbox("Select Soil Type", ["Loamy", "Sandy", "Clay"])
+        land_size = st.number_input("Enter Land Size (in acres)", min_value=1.0)
+        irrigation = st.selectbox("Irrigation Type", ["Drip", "Sprinkler", "Flood"])
+        harvest_season = st.selectbox("Preferred Harvest Season", ["Kharif", "Rabi", "Zaid"])
+        if st.button("Get Recommendations"):
+            recommendations = recommend_crops("Karnataka", soil_type, land_size, irrigation, harvest_season)
+            df = pd.DataFrame(recommendations)
+            st.table(df)
 
-        st.info("Note: These are tentative profits based on predicted prices and demand.")
-
-# Marketplace Page
-elif selected_page == "Marketplace":
-    marketplace_page()
+    # Marketplace Page
+    elif selected_page == "Marketplace":
+        marketplace_page()
