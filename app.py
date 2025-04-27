@@ -53,18 +53,11 @@ if not st.session_state.authenticated:
 
 # Main App
 else:
-    # Welcome message
-    st.title("🌾 Welcome to AgriPredict!")
-    st.markdown("""
-    **A platform to help farmers and agribusinesses make informed decisions.**
-    Navigate to different sections using the buttons in the menu box.
-    """)
-
-    # Add a log box with buttons for all features on the top-right
-    log_box_style = """
+    # Feature menu box (displayed on all pages)
+    menu_box_style = """
         <style>
-        .log-box {
-            position: absolute;
+        .menu-box {
+            position: fixed;
             top: 50px;
             right: 50px;
             width: 300px;
@@ -74,9 +67,10 @@ else:
             background-color: #f9f9f9;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .log-box h4 {
-            font-size: 18px;
-            margin-bottom: 10px;
+        .menu-box h4 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
         }
         div.stButton > button {
             font-size: 16px; /* Adjust button font size */
@@ -84,12 +78,12 @@ else:
             margin-bottom: 10px; /* Add space between buttons */
         }
         </style>
-        <div class="log-box">
-            <h4>📂 Features</h4>
+        <div class="menu-box">
+            <h4>🌾 AgriPredict</h4>
     """
-    st.markdown(log_box_style, unsafe_allow_html=True)
+    st.markdown(menu_box_style, unsafe_allow_html=True)
 
-    # Render buttons for navigation inside the log box
+    # Render buttons for navigation inside the menu box
     if st.button("🏠 Home", key="home"):
         st.session_state.current_page = "Home"
     if st.button("📈 Price Prediction", key="price_prediction"):
@@ -99,12 +93,17 @@ else:
     if st.button("🏪 Marketplace", key="marketplace"):
         st.session_state.current_page = "Marketplace"
 
-    # Close the log box HTML
+    # Close the menu box HTML
     st.markdown("</div>", unsafe_allow_html=True)
 
     # Render the selected page
     if st.session_state.current_page == "Home":
-        pass  # No additional text for the Home page
+        # Welcome message only on the Home page
+        st.title("🌾 Welcome to AgriPredict!")
+        st.markdown("""
+        **A platform to help farmers and agribusinesses make informed decisions.**
+        Navigate to different sections using the buttons in the menu box.
+        """)
 
     elif st.session_state.current_page == "Price Prediction":
         price_prediction_page()
