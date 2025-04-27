@@ -1,12 +1,14 @@
 import pandas as pd
 
-def recommend_crops(region, soil, land_area):
+def recommend_crops(region, soil, land_area, irrigation, season):
     """
-    Rule-based Crop Recommendation System.
+    Advanced Crop Recommendation System.
     Inputs:
         region (str): Region name
         soil (str): Soil type
         land_area (float): Land area in acres
+        irrigation (str): Type of irrigation
+        season (str): Harvest season
     Output:
         List of recommended crops with expected return, suitability score, and market demand level.
     """
@@ -14,8 +16,13 @@ def recommend_crops(region, soil, land_area):
     # Load historical data
     data = pd.read_csv('data/recommendation_data.csv')
 
-    # Filter by region and soil type
-    filtered_data = data[(data['region'] == region) & (data['soil_type'] == soil)]
+    # Filter by region, soil type, irrigation, and season
+    filtered_data = data[
+        (data['region'] == region) &
+        (data['soil_type'] == soil) &
+        (data['irrigation'] == irrigation) &
+        (data['season'] == season)
+    ]
 
     # Sort crops by expected return and demand score
     recommended_crops = filtered_data.sort_values(by=['expected_return_per_acre', 'demand_score'], ascending=False)
