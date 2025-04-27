@@ -60,9 +60,7 @@ else:
     Navigate to different sections using the buttons below.
     """)
 
-    # Create buttons for navigation with larger size
-    col1, col2, col3, col4 = st.columns(4)
-
+    # Centered 2x2 grid for navigation buttons
     button_style = """
         <style>
         div.stButton > button {
@@ -73,6 +71,9 @@ else:
         </style>
     """
     st.markdown(button_style, unsafe_allow_html=True)
+
+    col1, col2 = st.columns(2, gap="large")  # Two columns for the first row
+    col3, col4 = st.columns(2, gap="large")  # Two columns for the second row
 
     with col1:
         if st.button("🏠 Home"):
@@ -92,9 +93,7 @@ else:
 
     # Render the selected page
     if st.session_state.current_page == "Home":
-        st.header("📌 Home")
         st.write("""
-        Welcome to **AgriPredict**! 
         - A platform to help farmers and agribusinesses make informed decisions.
         - Navigate to different sections using the buttons above.
         """)
