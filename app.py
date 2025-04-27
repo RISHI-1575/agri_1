@@ -33,7 +33,8 @@ if not st.session_state.authenticated:
                 st.session_state.authenticated = True
                 st.session_state.role = role
                 st.success("Login successful!")
-                st.experimental_rerun()
+                # Ensure rerun is part of button logic
+                st.experimental_rerun()  
             else:
                 st.error("Invalid username or password.")
 
@@ -49,7 +50,6 @@ if not st.session_state.authenticated:
                 st.success(message)
             else:
                 st.error(message)
-
 # Main App
 else:
     st.sidebar.title("Navigation")
