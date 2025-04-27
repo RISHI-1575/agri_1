@@ -1,0 +1,7 @@
+soil_type,region,land_size,crop_type,expected_return_per_acre,demand_score
+Loamy,North Karnataka,1,Tomato,50000,85
+Loamy,North Karnataka,2,Tomato,100000,85
+Loamy,North Karnataka,1,Onion,45000,80
+Loamy,North Karnataka,2,Onion,90000,80
+Sandy,South Karnataka,1,Chili,60000,90
+Clay,North Karnataka,1,Tomato,47000,78
