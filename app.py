@@ -53,59 +53,46 @@ if not st.session_state.authenticated:
 
 # Main App
 else:
-    # Feature menu box (displayed on all pages)
-    menu_box_style = """
-        <style>
-        .menu-box {
-            position: fixed;
-            top: 50px;
-            right: 50px;
-            width: 300px;
-            padding: 20px;
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .menu-box h4 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        div.stButton > button {
-            font-size: 16px; /* Adjust button font size */
-            width: 100%; /* Stretch buttons to full width */
-            margin-bottom: 10px; /* Add space between buttons */
-        }
-        </style>
-        <div class="menu-box">
-            <h4>🌾 AgriPredict</h4>
-    """
-    st.markdown(menu_box_style, unsafe_allow_html=True)
-
-    # Render buttons for navigation inside the menu box
-    if st.button("🏠 Home", key="home"):
-        st.session_state.current_page = "Home"
-    if st.button("📈 Price Prediction", key="price_prediction"):
-        st.session_state.current_page = "Price Prediction"
-    if st.button("🌾 Crop Recommendation", key="crop_recommendation"):
-        st.session_state.current_page = "Crop Recommendation"
-    if st.button("🏪 Marketplace", key="marketplace"):
-        st.session_state.current_page = "Marketplace"
-
-    # Close the menu box HTML
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # Render the selected page
     if st.session_state.current_page == "Home":
-        # Welcome message only on the Home page
+        # Home Page with welcome message
         st.title("🌾 Welcome to AgriPredict!")
         st.markdown("""
         **A platform to help farmers and agribusinesses make informed decisions.**
-        Navigate to different sections using the buttons in the menu box.
+        Navigate to different sections using the buttons below.
         """)
 
-    elif st.session_state.current_page == "Price Prediction":
+    # Feature buttons in a line
+    button_style = """
+        <style>
+        div.stButton > button {
+            font-size: 18px; /* Increase font size */
+            height: 50px; /* Adjust height */
+            width: 100%; /* Stretch buttons to column width */
+        }
+        </style>
+    """
+    st.markdown(button_style, unsafe_allow_html=True)
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        if st.button("🏠 Home"):
+            st.session_state.current_page = "Home"
+
+    with col2:
+        if st.button("📈 Price Prediction"):
+            st.session_state.current_page = "Price Prediction"
+
+    with col3:
+        if st.button("🌾 Crop Recommendation"):
+            st.session_state.current_page = "Crop Recommendation"
+
+    with col4:
+        if st.button("🏪 Marketplace"):
+            st.session_state.current_page = "Marketplace"
+
+    # Render the selected page
+    if st.session_state.current_page == "Price Prediction":
         price_prediction_page()
 
     elif st.session_state.current_page == "Crop Recommendation":
