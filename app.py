@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import requests
 from utils.auth_utils import validate_login, register_user
 from utils.marketplace import marketplace_page
 from utils.price_prediction import price_prediction_page
@@ -14,6 +13,8 @@ if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 if "role" not in st.session_state:
     st.session_state.role = None
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "Home"  # Default to Home page
 
 # Login/Signup Page
 if not st.session_state.authenticated:
@@ -52,25 +53,41 @@ if not st.session_state.authenticated:
 
 # Main App
 else:
-    st.sidebar.title("Navigation")
-    selected_page = st.sidebar.radio("Go to", ["Home", "Price Prediction", "Crop Recommendation", "Marketplace"])
+    # Create buttons for navigation
+    st.title("🌾 Welcome to AgriPredict!")
+    st.markdown("**Empowering farmers and businesses with data-driven insights.**")
 
-    # Home Page
-    if selected_page == "Home":
-        st.title("🌾 AgriPredict - Home")
-        st.markdown("""
-        **Welcome to AgriPredict!**
-        - AgriPredict is a comprehensive platform designed to empower farmers and agribusinesses.
-        - With tools for price prediction, crop recommendation, and a marketplace for trading agricultural products, we aim to revolutionize the agricultural ecosystem.
-        - Explore the platform to maximize your yields and profits.
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        if st.button("🏠 Home"):
+            st.session_state.current_page = "Home"
+
+    with col2:
+        if st.button("📈 Price Prediction"):
+            st.session_state.current_page = "Price Prediction"
+
+    with col3:
+        if st.button("🌾 Crop Recommendation"):
+            st.session_state.current_page = "Crop Recommendation"
+
+    with col4:
+        if st.button("🏪 Marketplace"):
+            st.session_state.current_page = "Marketplace"
+
+    # Render the selected page
+    if st.session_state.current_page == "Home":
+        st.header("📌 Home")
+        st.write("""
+        Welcome to **AgriPredict**! 
+        - A platform to help farmers and agribusinesses make informed decisions.
+        - Navigate to different sections using the buttons above.
         """)
 
-    # Price Prediction Page
-    elif selected_page == "Price Prediction":
+    elif st.session_state.current_page == "Price Prediction":
         price_prediction_page()
 
-    # Crop Recommendation Page
-    elif selected_page == "Crop Recommendation":
+    elif st.session_state.current_page == "Crop Recommendation":
         st.title("🌾 Crop Recommendation")
 
         # Inputs
@@ -86,6 +103,5 @@ else:
             df = pd.DataFrame(recommendations)
             st.table(df)
 
-    # Marketplace Page
-    elif selected_page == "Marketplace":
+    elif st.session_state.current_page == "Marketplace":
         marketplace_page()
