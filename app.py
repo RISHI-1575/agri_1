@@ -94,12 +94,46 @@ else:
     if st.session_state.current_page == "Home":
         # Additional points about the project on the Home page
         st.markdown("### About AgriPredict")
+        
+        # Detailed explanation of features
+        st.markdown("#### Data-Driven Insights")
         st.markdown("""
-        - 🌟 **Data-Driven Insights**: Leverage data to make informed decisions about crops, pricing, and markets.
-        - 📈 **Price Prediction**: Predict future crop prices to maximize profitability.
-        - 🌾 **Crop Recommendation**: Get crop suggestions based on soil type, region, and land size.
-        - 🏪 **Marketplace Integration**: Connect farmers with potential buyers and streamline transactions.
-        - 💡 **User-Friendly Interface**: Easy-to-use platform designed for both farmers and businesses.
+        1. Provides actionable insights by analyzing agricultural data such as soil types, crop patterns, and market trends.
+        2. Helps farmers and agribusinesses make informed decisions to optimize productivity and profitability.
+        3. Encourages sustainable farming practices by recommending data-driven strategies.
+        4. Enables real-time monitoring and updates on agricultural trends, ensuring users stay ahead of challenges.
+        """)
+        
+        st.markdown("#### Price Prediction")
+        st.markdown("""
+        1. Predicts the future prices of crops based on historical data and market conditions.
+        2. Assists farmers in choosing the right time to sell their produce to maximize profits.
+        3. Uses advanced machine learning algorithms to ensure accurate and reliable price forecasts.
+        4. Helps mitigate risks by providing early warnings about potential price drops or market fluctuations.
+        """)
+        
+        st.markdown("#### Crop Recommendation")
+        st.markdown("""
+        1. Suggests the most suitable crops for a specific region based on soil type, climate, and available land size.
+        2. Enhances productivity by recommending crops that are best suited to the local environment.
+        3. Provides region-specific recommendations that account for climatic conditions and water availability.
+        4. Reduces trial-and-error farming, saving time, effort, and resources for farmers.
+        """)
+        
+        st.markdown("#### Marketplace Integration")
+        st.markdown("""
+        1. Connects farmers directly with potential buyers, reducing dependency on intermediaries.
+        2. Facilitates seamless transactions by providing a virtual marketplace for agricultural goods.
+        3. Encourages transparency in pricing, ensuring fair trade practices for both farmers and buyers.
+        4. Boosts farmers' income by providing access to a larger customer base, including businesses and distributors.
+        """)
+        
+        st.markdown("#### User-Friendly Interface")
+        st.markdown("""
+        1. Designed to be intuitive and easy-to-use for both tech-savvy and non-tech-savvy users.
+        2. Offers a simple and clean layout to ensure users can access features quickly and efficiently.
+        3. Provides multilingual support to cater to users from diverse linguistic backgrounds.
+        4. Ensures accessibility through mobile and web platforms, making it convenient for farmers in remote areas.
         """)
 
     elif st.session_state.current_page == "Price Prediction":
