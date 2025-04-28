@@ -15,15 +15,14 @@ def price_prediction_page():
         # Load historical price data
         df = pd.read_csv("data/price_data.csv")
 
-        # User input for crop and city
+        # User input for crop
         crop = st.selectbox("Select Crop", df["Crop"].unique())
-        city = st.selectbox("Select City", df["City"].unique())
 
-        # Filter data based on user input
-        filtered = df[(df["Crop"] == crop) & (df["City"] == city)]
+        # Filter data for Bangalore and selected crop
+        filtered = df[(df["Crop"] == crop) & (df["City"] == "Bangalore")]
 
         if filtered.empty:
-            st.error("No data available for the selected crop and city.")
+            st.error("No data available for the selected crop in Bangalore.")
         else:
             # Get the most recent data for prediction
             last_row = filtered.iloc[-1]
@@ -34,7 +33,7 @@ def price_prediction_page():
             future_months = [(month + i - 1) % 12 + 1 for i in range(1, 6)]
             predictions = model.predict(np.array(future_months).reshape(-1, 1))
 
-            # Map future months to string labels (e.g., "Jan", "Feb")
+            # Map future months to string labels (e.g., "May", "Jun")
             month_labels = [pd.Timestamp(f"{year}-{m:02d}-01").strftime("%b") for m in future_months]
 
             # Plot the historical and predicted prices
