@@ -42,8 +42,13 @@ def price_prediction_page():
         future_dates = [last_date + pd.DateOffset(months=i) for i in range(1, 6)]
         future_months = [date.month for date in future_dates]
 
+        # Prepare cyclic features for predictions
+        future_months_sin = np.sin(2 * np.pi * np.array(future_months) / 12)
+        future_months_cos = np.cos(2 * np.pi * np.array(future_months) / 12)
+        future_features = np.vstack((future_months_sin, future_months_cos)).T
+
         # Make predictions
-        predictions = model.predict(np.array(future_months).reshape(-1, 1))
+        predictions = model.predict(future_features)
 
         # Constrain predictions to historical range (for realism)
         historical_min = filtered["Modal Price"].min()
