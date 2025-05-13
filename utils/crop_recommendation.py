@@ -4,15 +4,15 @@ import numpy as np
 
 def recommend_crops(place, soil, land_area):
     """
-    Crop Recommendation System using a trained model and historical data.
+    Crop Recommendation System for North and South Karnataka, optimized for wasteland.
     Inputs:
-        place (str): Region or place name
+        place (str): Region (North Karnataka or South Karnataka)
         soil (str): Soil type
         land_area (float): Land area in acres
     Output:
-        List of recommended crops with expected return, suitability score, and market demand level.
+        List of recommended crops with expected return and market demand level.
     """
-    # Define mappings (same as in training)
+    # Define mappings
     soil_mapping = {
         "Loamy": 0,
         "Sandy": 1,
@@ -23,9 +23,7 @@ def recommend_crops(place, soil, land_area):
 
     region_mapping = {
         "North Karnataka": 0,
-        "South Karnataka": 1,
-        "Coastal Karnataka": 2,
-        "Central Karnataka": 3
+        "South Karnataka": 1
     }
 
     crop_mapping = {
@@ -39,7 +37,7 @@ def recommend_crops(place, soil, land_area):
 
     # Validate inputs
     if place not in region_mapping:
-        raise ValueError(f"Invalid region. Choose from {list(region_mapping.keys())}")
+        raise ValueError("Invalid region. Choose from ['North Karnataka', 'South Karnataka']")
     if soil not in soil_mapping:
         raise ValueError(f"Invalid soil type. Choose from {list(soil_mapping.keys())}")
     if not isinstance(land_area, (int, float)) or land_area <= 0:
@@ -50,23 +48,23 @@ def recommend_crops(place, soil, land_area):
         with open("models/crop_model.pkl", "rb") as f:
             model = pickle.load(f)
     except FileNotFoundError:
-        raise FileNotFoundError("Model file 'models/crop_model.pkl' not found. Please train the model first.")
+        raise FileNotFoundError("Model file 'models/crop_model.pkl' not found.")
 
-    # Map inputs to numeric values
+    # Map inputs to numeric
     soil_numeric = soil_mapping[soil]
     region_numeric = region_mapping[place]
 
-    # Prepare input for model
-    input_data = np.array([[soil_numeric, region_numeric, land_area]])
-
     # Predict crop
+    input_data = np.array([[soil_numeric, region_numeric, land_area]])
     predicted_crop_numeric = model.predict(input_data)[0]
     predicted_crop = crop_mapping.get(predicted_crop_numeric, "Unknown")
 
-    # Load historical data
+    # Load and filter historical data
     try:
         data = pd.read_csv('data/recommendation_data.csv')
+        data = data[data['region'].isin(["North Karnataka", "South Karnataka"])]
     except FileNotFoundError:
+.AWS_REGION us-east-1
         raise FileNotFoundError("Data file 'data/recommendation_data.csv' not found.")
 
     # Filter by place, soil type, and predicted crop
@@ -76,14 +74,14 @@ def recommend_crops(place, soil, land_area):
         (data['crop_type'] == predicted_crop)
     ]
 
-    # If no matching data, return empty list with warning
+    # If no matching data, return empty list
     if filtered_data.empty:
         return []
 
-    # Dynamically calculate expected return based on land size
+    # Calculate expected return
     filtered_data['dynamic_expected_return'] = filtered_data['expected_return_per_acre'] * land_area
 
-    # Sort crops by dynamic expected return and demand score
+    # Sort by return and demand
     recommended_crops = filtered_data.sort_values(by=['dynamic_expected_return', 'demand_score'], ascending=False)
 
     # Prepare output
