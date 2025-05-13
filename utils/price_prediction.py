@@ -36,14 +36,14 @@ def price_prediction_page():
         last_price = filtered["Modal Price"].iloc[-1]
         last_ma3 = filtered["Modal Price"].rolling(window=3, min_periods=1).mean().iloc[-1]
 
-        # Seasonal indices for Oct 2025 - Feb 2026
+        # Seasonal indices for May 2025 - Sep 2025
         seasonal_indices = {
-            "tomato": {10: 0.6, 11: 0.5, 12: 0.5, 1: 0.4, 2: 0.3},
-            "banana": {10: 0.6, 11: 0.5, 12: 0.5, 1: 0.5, 2: 0.6},
-            "mango": {10: 1.0, 11: 1.0, 12: 1.0, 1: 0.9, 2: 1.0},
-            "onion": {10: 0.6, 11: 0.5, 12: 0.4, 1: 0.3, 2: 0.3},
-            "carrot": {10: 0.7, 11: 0.8, 12: 0.6, 1: 0.7, 2: 0.8},
-            "apple": {10: 0.5, 11: 0.5, 12: 0.5, 1: 0.5, 2: 0.6}
+            "tomato": {5: 0.5, 6: 0.8, 7: 1.0, 8: 1.0, 9: 0.8},
+            "banana": {5: 0.6, 6: 0.7, 7: 0.7, 8: 0.7, 9: 0.6},
+            "mango": {5: 0.4, 6: 0.3, 7: 0.7, 8: 0.8, 9: 0.9},
+            "onion": {5: 0.6, 6: 0.8, 7: 1.0, 8: 1.0, 9: 0.8},
+            "carrot": {5: 0.6, 6: 0.5, 7: 0.5, 8: 0.5, 9: 0.6},
+            "apple": {5: 0.5, 6: 0.5, 7: 0.5, 8: 0.5, 9: 0.5}
         }
 
         # Prepare features for predictions
@@ -54,7 +54,7 @@ def price_prediction_page():
 
         # Predict prices for the next 5 months
         future_dates = [last_date + timedelta(days=30 * i) for i in range(1, 6)]
-        future_months = [(last_date.month + i - 1) % 12 + 1 for i in range(1, 6)]
+        future_months = [5, 6, 7, 8, 9]  # May to Sep 2025
         predictions = []
         current_price = last_price
         current_ma3 = last_ma3
