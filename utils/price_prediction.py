@@ -17,15 +17,16 @@ def price_prediction_page():
         crop = st.selectbox("Select Crop", df["Crop"].unique())
         city = st.selectbox("Select City", df["City"].unique())
 
-        # Load the model and encoder
+        # Load the model and metadata
         with open("models/price_model.pkl", "rb") as f:
             saved_data = pickle.load(f)
             model = saved_data["model"]
             encoder = saved_data["encoder"]
+            historical_stats = saved_data["historical_stats"]
+            trend = saved_data["trend"]
 
         # Filter data for the selected crop and city
         filtered = df[(df["Crop"] == crop) & (df["City"] == city)].sort_values("Date")
-
         if filtered.empty:
             st.error("No data available for the selected crop and city.")
             return
@@ -33,8 +34,9 @@ def price_prediction_page():
         # Get the last available date and price
         last_date = filtered["Date"].iloc[-1]
         last_price = filtered["Modal Price"].iloc[-1]
+        last_ma3 = filtered["Modal Price"].rolling(window=3, min_periods=1).mean().iloc[-1]
 
-        # Define seasonal indices for future months (Oct 2025 - Feb 2026)
+        # Seasonal indices for Oct 2025 - Feb 2026
         seasonal_indices = {
             "tomato": {10: 0.6, 11: 0.5, 12: 0.5, 1: 0.4, 2: 0.3},
             "banana": {10: 0.6, 11: 0.5, 12: 0.5, 1: 0.5, 2: 0.6},
@@ -44,35 +46,46 @@ def price_prediction_page():
             "apple": {10: 0.5, 11: 0.5, 12: 0.5, 1: 0.5, 2: 0.6}
         }
 
-        #  # Predict prices for the next 5 months
-        future_dates = [last_date + timedelta(days=30 * i) for i in range(1, 6)]
-        future_months = [(last_date.month + i - 1) % 12 + 1 for i in range(1, 6)]
-        predictions = []
-
         # Prepare features for predictions
         crop_encoded = encoder.transform([[crop]])
         crop_encoded_df = pd.DataFrame(crop_encoded, columns=encoder.get_feature_names_out(["Crop"]))
+        crop_stats = historical_stats[historical_stats["Crop"] == crop].iloc[0]
+        crop_trend = trend[crop]
 
+        # Predict prices for the next 5 months
+        future_dates = [last_date + timedelta(days=30 * i) for i in range(1, 6)]
+        future_months = [(last_date.month + i - 1) % 12 + 1 for i in range(1, 6)]
+        predictions = []
         current_price = last_price
-        for month in future_months:
+        current_ma3 = last_ma3
+
+        for i, month in enumerate(future_months):
             month_sin = np.sin(2 * np.pi * month / 12)
             month_cos = np.cos(2 * np.pi * month / 12)
             seasonal_index = seasonal_indices[crop.lower()][month]
             features = pd.concat([
                 crop_encoded_df,
-                pd.DataFrame([[month_sin, month_cos, seasonal_index, current_price]],
-                             columns=["Month_sin", "Month_cos", "Seasonal_Index", "Lagged_Price"])
+                pd.DataFrame([[
+                    month_sin, month_cos, seasonal_index, current_price, current_ma3,
+                    crop_stats["min"], crop_stats["max"], crop_stats["mean"], crop_trend
+                ]], columns=[
+                    "Month_sin", "Month_cos", "Seasonal_Index", "Lagged_Price", "Price_MA3",
+                    "min", "max", "mean", "Trend"
+                ])
             ], axis=1)
 
             # Predict the price
             pred = model.predict(features)[0]
             predictions.append(pred)
-            current_price = pred  # Update lagged price
+
+            # Update lagged price and moving average
+            current_price = pred
+            current_ma3 = (current_ma3 * 3 - current_ma3 + pred) / 3  # Simplified MA update
 
         # Constrain predictions to historical range
         historical_min = filtered["Modal Price"].min()
         historical_max = filtered["Modal Price"].max()
-        predictions = np.clip(predictions, historical_min * 0.9, historical_max * 1.1)
+        predictions = np.clip(predictions, historical_min * 0.85, historical_max * 1.15)
 
         # Plot the data
         fig = go.Figure()
@@ -95,6 +108,11 @@ def price_prediction_page():
             hovermode="x unified"
         )
         st.plotly_chart(fig, use_container_width=True)
+
+        # Display predictions
+        st.write("### Predicted Prices")
+        for date, price in zip(future_dates, predictions):
+            st.write(f"{date.strftime('%Y-%m-%d')}: ₹{price:.2f}")
 
     except Exception as e:
         st.error(f"An unexpected error occurred: {e}")
