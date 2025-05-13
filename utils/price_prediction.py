@@ -15,10 +15,15 @@ def price_prediction_page():
         crop = st.selectbox("Select Crop", df["Crop"].unique())
         city = st.selectbox("Select City", df["City"].unique())
 
-        # Load the pre-trained model for the selected crop
-        model_file = f"models/price_model_{crop.lower()}.pkl"
-        with open(model_file, "rb") as f:
-            model = pickle.load(f)
+        # Load the dictionary of pre-trained models
+        with open("models/price_models.pkl", "rb") as f:
+            crop_models = pickle.load(f)
+
+        # Get the model for the selected crop
+        model = crop_models.get(crop.lower())
+        if model is None:
+            st.error(f"No model found for the selected crop: {crop}")
+            st.stop()
 
         # Filter data for the selected crop and city
         filtered = df[(df["Crop"] == crop) & (df["City"] == city)]
