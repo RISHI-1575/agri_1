@@ -10,7 +10,7 @@ def recommend_crops(place, soil, land_area):
         soil (str): Soil type
         land_area (float): Land area in acres
     Output:
-        List of recommended crops with expected return and market demand level.
+        List of 2-3 recommended crops with expected return and market demand level.
     """
     # Define mappings
     soil_mapping = {
@@ -54,10 +54,11 @@ def recommend_crops(place, soil, land_area):
     soil_numeric = soil_mapping[soil]
     region_numeric = region_mapping[place]
 
-    # Predict crop
+    # Predict crop probabilities
     input_data = np.array([[soil_numeric, region_numeric, land_area]])
-    predicted_crop_numeric = model.predict(input_data)[0]
-    predicted_crop = crop_mapping.get(predicted_crop_numeric, "Unknown")
+    probas = model.predict_proba(input_data)[0]
+    top_crop_indices = np.argsort(probas)[-3:][::-1]  # Get top 3 crops
+    top_crops = [crop_mapping.get(idx, "Unknown") for idx in top_crop_indices]
 
     # Load and filter historical data
     try:
@@ -66,11 +67,11 @@ def recommend_crops(place, soil, land_area):
     except FileNotFoundError:
         raise FileNotFoundError("Data file 'data/recommendation_data.csv' not found.")
 
-    # Filter by place, soil type, and predicted crop
+    # Filter by place, soil type, and top crops
     filtered_data = data[
         (data['region'] == place) &
         (data['soil_type'] == soil) &
-        (data['crop_type'] == predicted_crop)
+        (data['crop_type'].isin(top_crops))
     ]
 
     # If no matching data, return empty list
@@ -80,9 +81,9 @@ def recommend_crops(place, soil, land_area):
     # Calculate expected return
     filtered_data['dynamic_expected_return'] = filtered_data['expected_return_per_acre'] * land_area
 
-    # Sort by return and demand
+    # Sort by return and demand, limit to 2-3 crops
     recommended_crops = filtered_data.sort_values(by=['dynamic_expected_return', 'demand_score'], ascending=False)
+    output = recommended_crops[['crop_type', 'dynamic_expected_return', 'demand_score']].head(3).to_dict(orient='records')
 
-    # Prepare output
-    output = recommended_crops[['crop_type', 'dynamic_expected_return', 'demand_score']].to_dict(orient='records')
-    return output
+    # Ensure at least 2 crops if available
+    return output if len(output) >= 2 else output
