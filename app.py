@@ -36,7 +36,6 @@ if not st.session_state.authenticated:
 
                 # Rerun the app to reflect changes
                 st.success("Login successful!")
-                st.experimental_rerun()  # This should now work as expected
             else:
                 st.error("Invalid username or password.")
                 
