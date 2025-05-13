@@ -8,16 +8,17 @@ def price_prediction_page():
     st.title("📈 Crop Price Prediction")
 
     try:
-        # Load the pre-trained model
-        with open("models/price_model.pkl", "rb") as f:
-            model = pickle.load(f)
-
         # Load historical price data
         df = pd.read_csv("data/price_data.csv")
 
         # User input for crop and city
         crop = st.selectbox("Select Crop", df["Crop"].unique())
         city = st.selectbox("Select City", df["City"].unique())
+
+        # Load the pre-trained model for the selected crop
+        model_file = f"models/price_model_{crop.lower()}.pkl"
+        with open(model_file, "rb") as f:
+            model = pickle.load(f)
 
         # Filter data for the selected crop and city
         filtered = df[(df["Crop"] == crop) & (df["City"] == city)]
@@ -36,44 +37,45 @@ def price_prediction_page():
         future_dates = [last_date + pd.DateOffset(months=i) for i in range(1, 6)]
         future_months = [date.month for date in future_dates]
 
-        try:
-            predictions = model.predict(np.array(future_months).reshape(-1, 1))
+        # Make predictions
+        predictions = model.predict(np.array(future_months).reshape(-1, 1))
 
-            if predictions is None or len(predictions) == 0:
-                st.error("Unable to generate predictions. Please try again later.")
-                st.stop()
+        # Constrain predictions to historical range (for realism)
+        historical_min = filtered["Modal Price"].min()
+        historical_max = filtered["Modal Price"].max()
+        predictions = np.clip(predictions, historical_min * 0.9, historical_max * 1.1)  # Allow 10% deviation
 
-            # Plot the data
-            fig = go.Figure()
-
-            # Historical Prices
-            fig.add_trace(go.Scatter(
-                x=filtered["Date"], 
-                y=filtered["Modal Price"], 
-                mode="lines+markers",
-                name="Historical Prices"
-            ))
-
-            # Predicted Prices
-            fig.add_trace(go.Scatter(
-                x=[date.strftime("%Y-%m-%d") for date in future_dates], 
-                y=predictions, 
-                mode="lines+markers",
-                name="Predicted Prices"
-            ))
-
-            fig.update_layout(
-                xaxis_title="Date",
-                yaxis_title="Price (INR)",
-                title=f"Price Prediction for {crop} in {city}",
-                hovermode="x unified"
-            )
-
-            st.plotly_chart(fig, use_container_width=True)
-
-        except Exception as e:
-            st.error(f"An error occurred while generating predictions: {e}")
+        if predictions is None or len(predictions) == 0:
+            st.error("Unable to generate predictions. Please try again later.")
             st.stop()
+
+        # Plot the data
+        fig = go.Figure()
+
+        # Historical Prices
+        fig.add_trace(go.Scatter(
+            x=filtered["Date"], 
+            y=filtered["Modal Price"], 
+            mode="lines+markers",
+            name="Historical Prices"
+        ))
+
+        # Predicted Prices
+        fig.add_trace(go.Scatter(
+            x=[date.strftime("%Y-%m-%d") for date in future_dates], 
+            y=predictions, 
+            mode="lines+markers",
+            name="Predicted Prices"
+        ))
+
+        fig.update_layout(
+            xaxis_title="Date",
+            yaxis_title="Price (INR)",
+            title=f"Price Prediction for {crop} in {city}",
+            hovermode="x unified"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
 
     except Exception as e:
         st.error(f"An unexpected error occurred: {e}")
