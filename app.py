@@ -29,15 +29,18 @@ if not st.session_state.authenticated:
         password = st.text_input("Password", type="password")
         role = st.selectbox("Role", ["farmer", "company"])
 
-        if st.button("Login"):
+       if st.button("Login"):
             if validate_login(username, password, role):
+                # Update session state
                 st.session_state.authenticated = True
                 st.session_state.role = role
+
+                # Rerun the app to reflect changes
                 st.success("Login successful!")
-                st.experimental_rerun()
+                st.experimental_rerun()  # This should now work as expected
             else:
                 st.error("Invalid username or password.")
-
+                
     with tab2:
         st.header("Signup")
         username = st.text_input("New Username")
