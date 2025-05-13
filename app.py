@@ -28,8 +28,7 @@ if not st.session_state.authenticated:
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         role = st.selectbox("Role", ["farmer", "company"])
-
-       if st.button("Login"):
+        if st.button("Login"):
             if validate_login(username, password, role):
                 # Update session state
                 st.session_state.authenticated = True
