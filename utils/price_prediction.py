@@ -35,25 +35,37 @@ def price_prediction_page():
         # Sort data by date
         filtered = filtered.sort_values("Date")
 
-        # Get the last available date
+        # Get the last available date and price
         last_date = pd.to_datetime(filtered["Date"].iloc[-1])
+        last_price = filtered["Modal Price"].iloc[-1]
 
         # Predict prices for the next 5 months
         future_dates = [last_date + pd.DateOffset(months=i) for i in range(1, 6)]
         future_months = [date.month for date in future_dates]
+        predictions = []
 
-        # Prepare cyclic features for predictions
-        future_months_sin = np.sin(2 * np.pi * np.array(future_months) / 12)
-        future_months_cos = np.cos(2 * np.pi * np.array(future_months) / 12)
-        future_features = np.vstack((future_months_sin, future_months_cos)).T
+        # Iteratively predict each month
+        current_price = last_price
+        for month in future_months:
+            # Prepare features for the current month
+            month_sin = np.sin(2 * np.pi * month / 12)
+            month_cos = np.cos(2 * np.pi * month / 12)
+            features = np.array([[month_sin, month_cos, current_price]])
 
-        # Make predictions
-        predictions = model.predict(future_features)
+            # Predict the price
+            pred = model.predict(features)[0]
+            predictions.append(pred)
+
+            # Update the lagged price for the next iteration
+            current_price = pred
+
+        # Convert predictions to numpy array
+        predictions = np.array(predictions)
 
         # Constrain predictions to historical range (for realism)
         historical_min = filtered["Modal Price"].min()
         historical_max = filtered["Modal Price"].max()
-        predictions = np.clip(predictions, historical_min * 0.9, historical_max * 1.1)  # Allow 10% deviation
+        predictions = np.clip(predictions, historical_min * 0.9, historical_max * 1.1)
 
         if predictions is None or len(predictions) == 0:
             st.error("Unable to generate predictions. Please try again later.")
