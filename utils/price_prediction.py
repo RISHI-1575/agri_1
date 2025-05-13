@@ -39,6 +39,16 @@ def price_prediction_page():
         last_date = pd.to_datetime(filtered["Date"].iloc[-1])
         last_price = filtered["Modal Price"].iloc[-1]
 
+        # Define Seasonal Index for future months (Oct 2025 - Feb 2026)
+        seasonal_indices = {
+            "tomato": {10: 0.6, 11: 0.5, 12: 0.5, 1: 0.4, 2: 0.3},
+            "banana": {10: 0.6, 11: 0.5, 12: 0.5, 1: 0.5, 2: 0.6},
+            "mango": {10: 1.0, 11: 1.0, 12: 1.0, 1: 0.9, 2: 1.0},
+            "onion": {10: 0.6, 11: 0.5, 12: 0.4, 1: 0.3, 2: 0.3},
+            "carrot": {10: 0.7, 11: 0.8, 12: 0.6, 1: 0.7, 2: 0.8},
+            "apple": {10: 0.5, 11: 0.5, 12: 0.5, 1: 0.5, 2: 0.6}
+        }
+
         # Predict prices for the next 5 months
         future_dates = [last_date + pd.DateOffset(months=i) for i in range(1, 6)]
         future_months = [date.month for date in future_dates]
@@ -50,7 +60,8 @@ def price_prediction_page():
             # Prepare features for the current month
             month_sin = np.sin(2 * np.pi * month / 12)
             month_cos = np.cos(2 * np.pi * month / 12)
-            features = np.array([[month_sin, month_cos, current_price]])
+            seasonal_index = seasonal_indices[crop.lower()][month]
+            features = np.array([[month_sin, month_cos, current_price, seasonal_index]])
 
             # Predict the price
             pred = model.predict(features)[0]
