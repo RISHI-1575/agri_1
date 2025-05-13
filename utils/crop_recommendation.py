@@ -64,7 +64,6 @@ def recommend_crops(place, soil, land_area):
         data = pd.read_csv('data/recommendation_data.csv')
         data = data[data['region'].isin(["North Karnataka", "South Karnataka"])]
     except FileNotFoundError:
-.AWS_REGION us-east-1
         raise FileNotFoundError("Data file 'data/recommendation_data.csv' not found.")
 
     # Filter by place, soil type, and predicted crop
