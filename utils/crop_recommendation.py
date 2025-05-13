@@ -67,23 +67,33 @@ def recommend_crops(place, soil, land_area):
     except FileNotFoundError:
         raise FileNotFoundError("Data file 'data/recommendation_data.csv' not found.")
 
-    # Filter by place, soil type, and top crops
+    # Filter by region and top crops
     filtered_data = data[
         (data['region'] == place) &
-        (data['soil_type'] == soil) &
         (data['crop_type'].isin(top_crops))
     ]
 
-    # If no matching data, return empty list
-    if filtered_data.empty:
-        return []
+    # If fewer than 2 crops, include all crops for the region as fallback
+    if len(filtered_data['crop_type'].unique()) < 2:
+        filtered_data = data[data['region'] == place]
+        top_crops = filtered_data['crop_type'].unique()[:3].tolist()
+
+    # Aggregate by crop type (mean return and demand score)
+    aggregated_data = filtered_data.groupby('crop_type').agg({
+        'expected_return_per_acre': 'mean',
+        'demand_score': 'mean'
+    }).reset_index()
+
+    # Filter to top crops if not fallback
+    if len(filtered_data['crop_type'].unique()) >= 2:
+        aggregated_data = aggregated_data[aggregated_data['crop_type'].isin(top_crops)]
 
     # Calculate expected return
-    filtered_data['dynamic_expected_return'] = filtered_data['expected_return_per_acre'] * land_area
+    aggregated_data['dynamic_expected_return'] = aggregated_data['expected_return_per_acre'] * land_area
 
     # Sort by return and demand, limit to 2-3 crops
-    recommended_crops = filtered_data.sort_values(by=['dynamic_expected_return', 'demand_score'], ascending=False)
+    recommended_crops = aggregated_data.sort_values(by=['dynamic_expected_return', 'demand_score'], ascending=False)
     output = recommended_crops[['crop_type', 'dynamic_expected_return', 'demand_score']].head(3).to_dict(orient='records')
 
     # Ensure at least 2 crops if available
-    return output if len(output) >= 2 else output
+    return output if output else []
