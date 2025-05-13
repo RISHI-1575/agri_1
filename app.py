@@ -146,7 +146,7 @@ else:
         # Inputs
         soil_type = st.selectbox("Select Soil Type", ["Loamy", "Sandy", "Clay"])
         land_size = st.number_input("Enter Land Size (in acres)", min_value=1.0)
-        place = st.selectbox("Select Place", ["North Karnataka", "South Karnataka", "Central Karnataka"])
+        place = st.selectbox("Select Place", ["North Karnataka", "South Karnataka"])
 
         if st.button("Get Recommendations"):
             # Prepare input data
